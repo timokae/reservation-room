@@ -5,7 +5,10 @@ defmodule ReservationServer.Store do
     Agent.start_link(
       fn ->
         %{
-          refresh_token: Application.get_env(:reservation_server, :refresh_token)
+          refresh_token: Application.get_env(:reservation_server, :refresh_token),
+          calenders: %{
+            meeting: "gjh9urs7c9474kqdt7r326d7d0@group.calendar.google.com"
+          }
         }
       end,
       name: __MODULE__
@@ -34,5 +37,10 @@ defmodule ReservationServer.Store do
     Agent.get(__MODULE__, fn map ->
       Map.get(map, :refresh_token)
     end)
+  end
+
+  def calender_id(calender) do
+    Agent.get(__MODULE__, &Map.get(&1, :calenders))
+    |> Map.get(calender)
   end
 end

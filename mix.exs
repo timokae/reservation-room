@@ -46,7 +46,8 @@ defmodule ReservationServer.MixProject do
       {:tortoise, "~> 0.9"},
       {:oauth2, "~> 1.0"},
       {:httpoison, "~> 1.4"},
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      {:timex, "~> 3.1"}
     ]
   end
 

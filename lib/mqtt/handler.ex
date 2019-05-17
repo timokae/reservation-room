@@ -41,13 +41,22 @@ defmodule Mqtt.Handler do
     {:ok, state}
   end
 
-  def handle_message(topic, publish, state) do
-    Logger.info("#{state.name}: #{Enum.join(topic, "/")} #{inspect(publish)}")
+  @spec handle_message(any(), any(), any()) :: {:ok, any()}
+  def handle_message([room, action], publish, state) do
+    Logger.info("#{state.name}: #{room}/#{action} #{inspect(publish)}")
 
-    ReservationServerWeb.RoomChannel.notify_new_reservation(
-      Enum.join(topic, ":"),
-      publish
+    {duration, _} = Integer.parse(publish)
+
+    GoogleService.Calender.insert_block(
+      ReservationServer.Store.access_token(),
+      ReservationServer.Store.calender_id(:meeting),
+      duration
     )
+
+    # ReservationServerWeb.RoomChannel.notify_new_reservation(
+    #   Enum.join(topic, ":"),
+    #   publish
+    # )
 
     {:ok, state}
   end

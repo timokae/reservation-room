@@ -22,7 +22,7 @@ defmodule ReservationServer.Application do
         client_id: :a,
         handler: {Mqtt.Handler, [name: :server]},
         server: {Tortoise.Transport.Tcp, host: 'localhost', port: 1883},
-        subscriptions: [{"room/+", 0}]
+        subscriptions: [{"+/reserveRequest", 0}]
       )
 
     # See https://hexdocs.pm/elixir/Supervisor.html
