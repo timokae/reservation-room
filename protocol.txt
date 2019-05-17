@@ -1,0 +1,13 @@
+Blocker
+--------
+pub: <<raumname>>/reserveRequest  "<<Anzahl Minuten>>"
+sub: <<raumname>>/reserveResponse "true;0" | "false;<<Minuten bis nächster Termin>>"
+
+--> meetingraum1/request "60"
+<-- meetingraum1/response "true;0"
+
+Screen
+--------
+sub: <<raumname>>/nextReservation   "<<codierted Datum>>"
+sub: <<raumname>>/newBlock          "<<true|false>>;<<terminname>>;von <<timeStart>> bis <<timeEnd>>;<<Person>>"
+
