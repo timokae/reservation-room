@@ -1,6 +1,5 @@
 defmodule GoogleService.Auth do
   def authorize_url do
-    # url = "https://accounts.google.com/o/oauth2/auth"
     url = "https://accounts.google.com/o/oauth2/v2/auth"
 
     options = [

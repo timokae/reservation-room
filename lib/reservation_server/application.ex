@@ -14,7 +14,9 @@ defmodule ReservationServer.Application do
       ReservationServerWeb.Endpoint,
       # Starts a worker by calling: ReservationServer.Worker.start_link(arg)
       # {ReservationServer.Worker, arg},
-      ReservationServer.Store
+      ReservationServer.Store,
+      GoogleService.Refresher,
+      GoogleService.EventFetcher
     ]
 
     {:ok, _} =
@@ -22,7 +24,7 @@ defmodule ReservationServer.Application do
         client_id: :a,
         handler: {Mqtt.Handler, [name: :server]},
         server: {Tortoise.Transport.Tcp, host: 'localhost', port: 1883},
-        subscriptions: [{"+/reserveRequest", 0}]
+        subscriptions: [{"+/+", 0}]
       )
 
     # See https://hexdocs.pm/elixir/Supervisor.html

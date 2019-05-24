@@ -42,3 +42,15 @@ npm-debug.log
 /config/*.secret.exs
 
 /.env
+
+.eunit
+deps
+*.o
+*.beam
+.elixir_ls/
+*.plt
+erl_crash.dump
+ebin/*.beam
+rel/example_project
+.concrete/DEV_MODE
+.rebar

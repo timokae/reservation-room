@@ -41,22 +41,38 @@ defmodule Mqtt.Handler do
     {:ok, state}
   end
 
-  @spec handle_message(any(), any(), any()) :: {:ok, any()}
-  def handle_message([room, action], publish, state) do
-    Logger.info("#{state.name}: #{room}/#{action} #{inspect(publish)}")
+  def handle_message([room, "reserveRequest"], publish, state) do
+    Logger.info("#{state.name}: #{room}/reserveRequest #{inspect(publish)}")
 
-    {duration, _} = Integer.parse(publish)
+    # {duration, _} = Integer.parse(publish)
 
-    GoogleService.Calender.insert_block(
-      ReservationServer.Store.access_token(),
-      ReservationServer.Store.calender_id(:meeting),
-      duration
-    )
+    # GoogleService.Calender.insert_block(
+    #   ReservationServer.Store.access_token(),
+    #   ReservationServer.Store.calender_id(:meeting),
+    #   duration
+    # )
 
     # ReservationServerWeb.RoomChannel.notify_new_reservation(
     #   Enum.join(topic, ":"),
     #   publish
     # )
+
+    {:ok, state}
+  end
+
+  def handle_message([room, "releaseRequest"], _, state) do
+    Logger.info("#{state.name}: #{room}/releaseRequest")
+
+    GoogleService.Calender.delete_current_block(
+      ReservationServer.Store.access_token(),
+      ReservationServer.Store.calender_id(:meeting)
+    )
+
+    {:ok, state}
+  end
+
+  def handle_message(_, _, state) do
+    Logger.warn("Unhandled Message!")
 
     {:ok, state}
   end

@@ -3,6 +3,9 @@ Blocker
 pub: <<raumname>>/reserveRequest  "<<Anzahl Minuten>>"
 sub: <<raumname>>/reserveResponse "true;0" | "false;<<Minuten bis nächster Termin>>"
 
+pub: <<raumname>>/releaseRequest "0"
+
+
 --> meetingraum1/request "60"
 <-- meetingraum1/response "true;0"
 
