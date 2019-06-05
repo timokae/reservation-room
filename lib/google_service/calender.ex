@@ -158,7 +158,8 @@ defmodule GoogleService.Calender do
         |> Map.get("dateTime")
         |> Timex.parse!("{ISO:Extended}")
 
-      {:blocked, Timex.diff(from, next_event_start, :minutes)}
+      # {:blocked, Timex.diff(next_event_start, from, :minutes)}
+      {:blocked, Timex.format!(next_event_start, "%H:%M", :strftime)}
     else
       {:ok, 0}
     end

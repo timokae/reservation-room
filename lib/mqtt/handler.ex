@@ -44,13 +44,24 @@ defmodule Mqtt.Handler do
   def handle_message([room, "reserveRequest"], publish, state) do
     Logger.info("#{state.name}: #{room}/reserveRequest #{inspect(publish)}")
 
-    # {duration, _} = Integer.parse(publish)
+    {duration, _} = Integer.parse(publish)
+    atom = String.to_atom(room)
 
-    # GoogleService.Calender.insert_block(
-    #   ReservationServer.Store.access_token(),
-    #   ReservationServer.Store.calender_id(:meeting),
-    #   duration
-    # )
+    response =
+      GoogleService.Calender.insert_block(
+        ReservationServer.Store.access_token(),
+        ReservationServer.Store.calender_id(atom),
+        duration
+      )
+
+    case response do
+      {:ok, _} ->
+        Tortoise.publish(:server, "#{room}/reserveResponse", "true;0")
+        GoogleService.EventFetcher.check_for_new_events([atom])
+
+      {:blocked, time} ->
+        Tortoise.publish(:server, "#{room}/reserveResponse", "false;#{time}")
+    end
 
     # ReservationServerWeb.RoomChannel.notify_new_reservation(
     #   Enum.join(topic, ":"),
@@ -63,15 +74,22 @@ defmodule Mqtt.Handler do
   def handle_message([room, "releaseRequest"], _, state) do
     Logger.info("#{state.name}: #{room}/releaseRequest")
 
+    atom = String.to_atom(room)
+
     GoogleService.Calender.delete_current_block(
       ReservationServer.Store.access_token(),
-      ReservationServer.Store.calender_id(:meeting)
+      ReservationServer.Store.calender_id(atom)
     )
 
     {:ok, state}
   end
 
-  def handle_message(_, _, state) do
+  def handle_message([_, "reservationUpdate"], _, state), do: {:ok, state}
+  def handle_message([_, "reserveResponse"], _, state), do: {:ok, state}
+
+  def handle_message(room, publish, state) do
+    IO.inspect(room)
+    IO.puts(publish)
     Logger.warn("Unhandled Message!")
 
     {:ok, state}

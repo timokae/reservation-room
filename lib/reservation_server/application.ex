@@ -21,7 +21,7 @@ defmodule ReservationServer.Application do
 
     {:ok, _} =
       Tortoise.Supervisor.start_child(
-        client_id: :a,
+        client_id: :server,
         handler: {Mqtt.Handler, [name: :server]},
         server: {Tortoise.Transport.Tcp, host: 'localhost', port: 1883},
         subscriptions: [{"+/+", 0}]

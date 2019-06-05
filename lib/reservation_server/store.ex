@@ -9,12 +9,13 @@ defmodule ReservationServer.Store do
     Agent.start_link(
       fn ->
         %{
-          calender_atoms: [:meeting],
+          calender_atoms: [:R347],
           refresh_token: Application.get_env(:reservation_server, :refresh_token),
           calenders: %{
-            meeting: %{
+            R347: %{
               id: "gjh9urs7c9474kqdt7r326d7d0@group.calendar.google.com",
-              next_events: []
+              next_events: [],
+              hash: ""
             }
           }
         }
@@ -65,9 +66,31 @@ defmodule ReservationServer.Store do
     |> Map.get(:next_events)
   end
 
-  def put_next_events(calender, events) do
-    Agent.update(__MODULE__, fn map ->
-      update_in(map, [:calenders, calender, :next_events], fn _list -> events end)
-    end)
+  def compare_and_put_next_events({calender, events}) do
+    event_1 = Enum.at(events, 0, %{}) |> Poison.encode!()
+    event_2 = Enum.at(events, 1, %{}) |> Poison.encode!()
+    hash = :crypto.hash(:sha256, [event_1, event_2])
+
+    cond do
+      hash != events_hash(calender) ->
+        Agent.update(__MODULE__, fn map ->
+          update_in(map, [:calenders, calender, :hash], fn _ -> hash end)
+        end)
+
+        Agent.update(__MODULE__, fn map ->
+          update_in(map, [:calenders, calender, :next_events], fn _list -> events end)
+        end)
+
+        {calender, events}
+
+      true ->
+        {calender, nil}
+    end
+  end
+
+  def events_hash(calender) do
+    Agent.get(__MODULE__, &Map.get(&1, :calenders))
+    |> Map.get(calender)
+    |> Map.get(:hash)
   end
 end
